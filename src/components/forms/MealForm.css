@@ -1,0 +1,54 @@
+.meal-form {
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.form-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+
+.form-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.form-actions button {
+  flex: 1;
+}
+
+/* 반응형 */
+@media (max-width: 768px) {
+  .meal-form {
+    margin: 0;
+  }
+  
+  .form-title {
+    font-size: 20px;
+    margin-bottom: 20px;
+  }
+  
+  
+  .form {
+    gap: 16px;
+  }
+  
+  .form-actions {
+    flex-direction: column;
+  }
+  
+  .form-actions button {
+    width: 100%;
+  }
+}

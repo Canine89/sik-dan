@@ -1,0 +1,227 @@
+.meal-list {
+  width: 100%;
+}
+
+.meal-list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+}
+
+.meal-list-header h2 {
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.sort-controls {
+  display: flex;
+  gap: 8px;
+}
+
+/* 빈 상태 */
+.empty-meals {
+  text-align: center;
+  padding: 48px 24px;
+}
+
+.empty-content h3 {
+  font-size: 20px;
+  color: var(--text-primary);
+  margin-bottom: 8px;
+}
+
+.empty-content p {
+  color: var(--text-secondary);
+}
+
+/* 날짜별 그룹 */
+.grouped-meals {
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+.day-group {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.day-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 0;
+  border-bottom: 2px solid var(--glass-border);
+}
+
+.day-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.day-calories {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--accent-primary);
+  background: var(--glass-bg);
+  padding: 4px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--glass-border);
+}
+
+.day-meals {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* 식단 아이템 */
+.meal-item {
+  transition: all 0.3s ease;
+}
+
+.meal-item:hover {
+  transform: translateY(-2px);
+}
+
+.meal-item-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 12px;
+}
+
+.meal-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.meal-type {
+  display: inline-block;
+  background: var(--accent-primary);
+  color: white;
+  padding: 2px 8px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  width: fit-content;
+}
+
+.meal-date {
+  font-size: 13px;
+  color: var(--text-muted);
+}
+
+.meal-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.meal-content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.food-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0;
+}
+
+.calories {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--accent-secondary);
+  margin: 0;
+}
+
+.memo {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin: 0;
+  font-style: italic;
+}
+
+/* 삭제 확인 */
+.delete-confirm {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--glass-border);
+}
+
+.delete-confirm p {
+  color: var(--text-primary);
+  margin-bottom: 12px;
+  font-size: 14px;
+}
+
+.confirm-actions {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+/* 단순 목록 */
+.simple-meals {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* 반응형 */
+@media (max-width: 768px) {
+  .meal-list-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 16px;
+  }
+
+  .meal-list-header h2 {
+    font-size: 20px;
+  }
+
+  .sort-controls {
+    justify-content: center;
+  }
+
+  .day-header {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+    text-align: center;
+  }
+
+  .day-title {
+    font-size: 16px;
+  }
+
+  .meal-item-header {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .meal-actions {
+    justify-content: flex-start;
+  }
+
+  .confirm-actions {
+    justify-content: stretch;
+  }
+
+  .confirm-actions button {
+    flex: 1;
+  }
+
+  .grouped-meals {
+    gap: 24px;
+  }
+}
