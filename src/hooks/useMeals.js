@@ -1,9 +1,10 @@
 import { useState, useEffect } from 'react';
 import { getMealsByDate, createMeal, deleteMeal as deleteMealAPI, getAllFoods } from '../lib/database.js';
+import { testSupabaseConnection } from '../lib/supabase.js';
 import { MEAL_TYPES } from '../types/database.types.js';
 
 const STORAGE_KEY = 'sik-dan-meals';
-const DEMO_USER_ID = 'demo-user-123'; // 데모용 사용자 ID
+const DEMO_USER_ID = '00000000-0000-0000-0000-000000000123'; // 데모용 UUID 형식 사용자 ID
 
 export const useMeals = () => {
   const [meals, setMeals] = useState([]);
@@ -48,6 +49,7 @@ export const useMeals = () => {
       const storedMeals = localStorage.getItem(STORAGE_KEY);
       if (storedMeals) {
         const parsedMeals = JSON.parse(storedMeals);
+        console.log('📱 localStorage에서 로드된 식단 데이터:', parsedMeals);
         return parsedMeals;
       }
       return [];
@@ -72,10 +74,27 @@ export const useMeals = () => {
     setError(null);
     
     try {
+      console.log('📊 식단 앱 초기 데이터 로드 시작...');
+      
+      // Supabase 연결 테스트
+      const connectionTest = await testSupabaseConnection();
+      if (!connectionTest.success) {
+        console.error('❌ Supabase 연결 실패:', connectionTest.error);
+        setError(`데이터베이스 연결 실패: ${connectionTest.error}`);
+        
+        // localStorage에서 로드
+        const localMeals = loadMealsFromStorage();
+        setMeals(localMeals);
+        setLoading(false);
+        return;
+      }
+      
       // 음식 데이터 로드
+      console.log('🍽️ 음식 데이터 로드 중...');
       await loadFoods();
       
       // 오늘 날짜의 식단 데이터 로드
+      console.log('📅 오늘 식단 데이터 로드 중...');
       const today = new Date().toISOString().split('T')[0];
       const todayMeals = await loadMealsByDate(today);
       setMeals(todayMeals);
@@ -83,9 +102,15 @@ export const useMeals = () => {
       // localStorage에도 백업
       saveMeals(todayMeals);
       
+      console.log('✅ 초기 데이터 로드 완료!', {
+        foods: foods.length,
+        meals: todayMeals.length,
+        date: today
+      });
+      
     } catch (error) {
-      console.error('초기 데이터 로드 실패:', error);
-      setError('데이터 로드에 실패했습니다. 인터넷 연결을 확인해주세요.');
+      console.error('❌ 초기 데이터 로드 실패:', error);
+      setError(`데이터 로드 실패: ${error.message}`);
       
       // Supabase 연결 실패 시 localStorage에서 로드
       const localMeals = loadMealsFromStorage();
@@ -100,40 +125,32 @@ export const useMeals = () => {
     loadInitialData();
   }, []);
 
-  // 식단 추가
+  // 식단 추가 (간단한 로컬 저장 방식으로 변경)
   const addMeal = async (mealData) => {
     try {
-      const mealToCreate = {
-        user_id: DEMO_USER_ID,
-        meal_type: mealData.mealType || 'breakfast',
-        meal_date: mealData.date || new Date().toISOString().split('T')[0],
-        name: mealData.name || mealData.title
-      };
-
-      const result = await createMeal(mealToCreate);
+      console.log('🍽️ 식단 추가 시작:', mealData);
       
-      if (result.error) {
-        console.error('식단 추가 실패:', result.message);
-        // 로컬 저장으로 폴백
-        const newMeal = {
-          ...mealData,
-          id: Date.now(),
-          createdAt: new Date().toISOString()
-        };
-        const updatedMeals = [...meals, newMeal];
-        setMeals(updatedMeals);
-        saveMeals(updatedMeals);
-        return newMeal;
-      }
-
-      // 성공 시 로컬 state 업데이트
-      const updatedMeals = [...meals, result.data];
+      // 간단하게 로컬에만 저장하도록 임시 변경
+      // TODO: 나중에 meal_items 테이블과 연동하여 완전한 Supabase 저장 구현
+      const newMeal = {
+        ...mealData,
+        id: Date.now(),
+        createdAt: new Date().toISOString(),
+        // Supabase 형식도 지원
+        meal_type: mealData.mealType,
+        meal_date: mealData.date,
+        name: mealData.foodName
+      };
+      
+      const updatedMeals = [...meals, newMeal];
       setMeals(updatedMeals);
       saveMeals(updatedMeals);
       
-      return result.data;
+      console.log('✅ 로컬 저장 완료:', newMeal);
+      return newMeal;
+      
     } catch (error) {
-      console.error('식단 추가 중 오류:', error);
+      console.error('❌ 식단 추가 중 오류:', error);
       throw error;
     }
   };
@@ -201,9 +218,14 @@ export const useMeals = () => {
     return meals.filter(meal => (meal.meal_type || meal.mealType) === mealType);
   };
 
-  // 칼로리 통계
+  // 칼로리 통계 (로컬 데이터 사용)
   const getCalorieStats = (date) => {
-    const dayMeals = getMealsByDate(date);
+    // 로컬 상태에서 해당 날짜의 식사 필터링
+    const dayMeals = meals.filter(meal => {
+      const mealDate = meal.meal_date || meal.date;
+      return mealDate === date;
+    });
+    
     const stats = {
       breakfast: 0,
       lunch: 0,
@@ -212,10 +234,18 @@ export const useMeals = () => {
       total: 0
     };
 
-    dayMeals.forEach(meal => {
-      stats[meal.mealType] += meal.calories;
-      stats.total += meal.calories;
-    });
+    // dayMeals가 배열인지 확인
+    if (Array.isArray(dayMeals)) {
+      dayMeals.forEach(meal => {
+        const mealType = meal.meal_type || meal.mealType || 'breakfast';
+        const calories = meal.calories || 0;
+        
+        if (stats.hasOwnProperty(mealType)) {
+          stats[mealType] += calories;
+        }
+        stats.total += calories;
+      });
+    }
 
     return stats;
   };

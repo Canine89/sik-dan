@@ -13,7 +13,20 @@ export const getMealTypeLabel = (mealType) => {
 
 // 칼로리를 포맷팅 (콤마 추가)
 export const formatCalories = (calories) => {
-  return calories.toLocaleString('ko-KR');
+  // undefined, null, NaN 처리
+  if (calories === undefined || calories === null || isNaN(calories)) {
+    return '0';
+  }
+  
+  // 숫자로 변환
+  const numCalories = Number(calories);
+  
+  // 유효하지 않은 숫자면 0 반환
+  if (isNaN(numCalories) || numCalories < 0) {
+    return '0';
+  }
+  
+  return numCalories.toLocaleString('ko-KR');
 };
 
 // 식단 데이터를 날짜별로 그룹화

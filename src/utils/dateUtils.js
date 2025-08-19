@@ -15,9 +15,20 @@ export const getTodayString = () => {
 
 // 날짜를 한국어 형식으로 포맷 (예: 2024년 1월 15일)
 export const formatDateKorean = (date) => {
+  // null, undefined 처리
+  if (!date) {
+    return '날짜 없음';
+  }
+  
   if (!(date instanceof Date)) {
     date = new Date(date);
   }
+  
+  // Invalid Date 처리
+  if (isNaN(date.getTime())) {
+    return '잘못된 날짜';
+  }
+  
   return date.toLocaleDateString('ko-KR', {
     year: 'numeric',
     month: 'long',
@@ -27,9 +38,20 @@ export const formatDateKorean = (date) => {
 
 // 요일을 한국어로 반환 (예: 월요일)
 export const getDayOfWeekKorean = (date) => {
+  // null, undefined 처리
+  if (!date) {
+    return '';
+  }
+  
   if (!(date instanceof Date)) {
     date = new Date(date);
   }
+  
+  // Invalid Date 처리
+  if (isNaN(date.getTime())) {
+    return '';
+  }
+  
   return date.toLocaleDateString('ko-KR', { weekday: 'long' });
 };
 

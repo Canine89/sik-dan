@@ -7,6 +7,9 @@ import './MealList.css';
 const MealItem = ({ meal, onEdit, onDelete }) => {
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
 
+  // 디버깅: 받은 meal 데이터 확인
+  console.log('🍽️ MealItem에서 받은 데이터:', meal);
+
   const handleDelete = () => {
     onDelete(meal.id);
     setShowDeleteConfirm(false);
@@ -16,9 +19,9 @@ const MealItem = ({ meal, onEdit, onDelete }) => {
     <Card className="meal-item" variant="light">
       <div className="meal-item-header">
         <div className="meal-info">
-          <span className="meal-type">{getMealTypeLabel(meal.mealType)}</span>
+          <span className="meal-type">{getMealTypeLabel(meal.mealType || meal.meal_type)}</span>
           <span className="meal-date">
-            {formatDateKorean(meal.date)} ({getDayOfWeekKorean(new Date(meal.date))})
+            {formatDateKorean(meal.date || meal.meal_date)} ({getDayOfWeekKorean(new Date(meal.date || meal.meal_date))})
           </span>
         </div>
         <div className="meal-actions">
@@ -36,7 +39,7 @@ const MealItem = ({ meal, onEdit, onDelete }) => {
       </div>
       
       <div className="meal-content">
-        <h3 className="food-name">{meal.foodName}</h3>
+        <h3 className="food-name">{meal.foodName || meal.name || '음식명 없음'}</h3>
         <p className="calories">{formatCalories(meal.calories)} kcal</p>
         {meal.memo && <p className="memo">{meal.memo}</p>}
       </div>
